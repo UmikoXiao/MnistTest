@@ -57,7 +57,7 @@ class ResNet18(nn.Module):
             CommonBlock(64, 64, 1)
         )
         self.layer2 = nn.Sequential(            # 升维，Special+Common,64*28*28=>128*28*28
-            SpecialBlock(64, 128, [1, 1]),      # 为了维持矩阵结构，不进行下采样
+            SpecialBlock(64, 128, [2, 1]),      # 为了维持矩阵结构，不进行下采样
             CommonBlock(128, 128, 1)            # CommonBlock两次卷积，128*28*28=>128*28*28
         )
         self.layer3 = nn.Sequential(
@@ -71,10 +71,7 @@ class ResNet18(nn.Module):
         self.pool = nn.AdaptiveAvgPool2d(output_size=(1, 1))    # 卷积结束，通过一个自适应均值池化 512*7*7=>512*1*1
         self.fc = nn.Sequential(                # 最后用于分类的全连接层
             nn.Dropout(p=0.5),                  # 训练阶段Dropout防止过拟合，0.5概率
-            nn.Linear(512, 256),                # 全连接层降维256
-            nn.ReLU(inplace=True),
-            nn.Dropout(p=0.5),                  # 训练阶段Dropout防止过拟合，0.5概率
-            nn.Linear(256, classes_num)         # mnist10分类问题，全连接层降维10
+            nn.Linear(512, classes_num)         # mnist10分类问题，全连接层降维10
         )
 
     def forward(self, x):

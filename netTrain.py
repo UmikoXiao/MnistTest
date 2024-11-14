@@ -11,7 +11,7 @@ from torch.nn import CrossEntropyLoss
 from torch import optim
 from loadData import DealDataset
 
-save_path = "./mnist_MLP4.pth"  # 模型权重参数保存位置
+save_path = "./mnist_ResNet18.pth"  # 模型权重参数保存位置
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # 创建GPU运算环境
 print(device)
 
@@ -20,10 +20,10 @@ EPOCH = 30  # 总共训练轮数
 learning_rate = 0.05  # 学习率
 
 """采用的网络框架"""
-# from resNetModel import ResNet18
-# testFramwork = ResNet18
-from MLPModel import MLP
-testFramwork = MLP
+from resNetModel import ResNet18
+testFramwork = ResNet18
+# from MLPModel import MLP
+# testFramwork = MLP
 
 """采用的优化器"""
 opt = optim.SGD
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     net = testFramwork(10)
     net.to(device)  # 实例化网络模型并送入GPU
     # net.load_state_dict(torch.load(save_path))  # 使用上次训练权重接着训练
-    optimizer = opt(net.parameters(), learning_rate,0.1)
+    optimizer = opt(net.parameters(), learning_rate)
     bestAcc = 0
 
     accListTest, accListTrain = [], []
@@ -119,5 +119,5 @@ if __name__ == '__main__':
     plt.legend()
     plt.xlabel('iteration')
     plt.ylabel('acc %')
-    plt.savefig(save_path+'.png')
+    plt.savefig('figure/'+save_path+'.png')
     plt.show(block=True)
