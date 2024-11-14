@@ -163,13 +163,13 @@ x.to(device)
 
 ### 结果
 
-单隐藏层使用SGD优化器收敛时间119s，最大识别准确率95.45%
+单隐藏层使用SGD优化器计算时间119s，最大识别准确率95.45%，epoch==28左右稳定
 ![mnist_MLP1.pth.png](figure/mnist_MLP1.pth.png)
-2隐藏层收敛时间117s，最大识别准确率96.39%
+2隐藏层计算时间117s，最大识别准确率96.39%,epoch==20左右稳定
 ![mnist_MLP2.pth.png](figure/mnist_MLP2.pth.png)
-3隐藏层收敛时间115s，最大识别准确率96.98%
+3隐藏层计算时间115s，最大识别准确率96.98%,epoch==14左右稳定
 ![mnist_MLP3.pth.png](figure/mnist_MLP3.pth.png)
-4隐藏层收敛时间115s，最大识别准确率97.08%
+4隐藏层计算时间115s，最大识别准确率97.08%,epoch==14左右稳定
 ![mnist_MLP4.pth.png](figure/mnist_MLP4.pth.png)
 
 对4隐藏层的多层感知机（全连接神经网络）尝试使用不同的优化器进行参数估计。
@@ -185,6 +185,24 @@ x.to(device)
 
 该部分的网络定义在LeNetModel.py中。
 ![LeNet.png](figure/LeNet.png)
+其采用的CNN思想是先卷积、再池化、再卷积的方式，反复操作实现对维度的压缩。由于LeNet提出时还没有ReLU激活函数，
+其在卷积层中使用的时Tanh激活函数，而全连接层里采用的时Sigmoid激活函数
+LeNet4和LeNet5的主要优化点在于最后的全连接层的深度。
+
+### 结果
+
+LeNet1计算时间为96s，最终精度为94.46%；约epoch29实现稳定
+![LeNet1.pth.png](figure/LeNet1.pth.png)
+LeNet4计算时间为97s，最终精度为92.00%；约epoch20实现稳定
+![LeNet4.pth.png](figure/LeNet4.pth.png)
+LeNet5计算时间为96s，最终精度为94.46%；约epoch15实现稳定
+![LeNet5_re2.pth.png](figure/LeNet5_re2.pth.png)
+其中LeNet5采用两个Sigmoid激活函数时导致了梯度消失使得模型发散；
+![LeNet5.pth.png](figure/LeNet5.pth.png)
+将其中一个Sigmoid替换为ReLU后，训练初期梯度极小导致收敛很慢，中后段梯度回归正常区间，进行50epoch才实现收敛，最终精度为93.68%；
+![LeNet5_re.pth.png](figure/LeNet5_re.pth.png)
+将两个Sigmoid都替换为ReLU后，模型在前期就能正常收敛，最终精度97.47%。
+![LeNet5_re2.pth.png](figure/LeNet5_re2.pth.png)
 ## ResNet
 
 该部分的网络定义在resNetModel.py中。网络结构如下：
@@ -201,11 +219,11 @@ ResNet主要两个特点是
 
 ### 结果
 ResNet18已经出现过拟合。其收敛总用时1324s，最高精确度可达99.23%,测试集精度非常不稳定。
-同时其epoch1的acc就已经达到96.98%，相当于三层隐藏层MLP的效果，此时用时约为133s
+同时其epoch1的acc就已经达到96.98%，相当于三层隐藏层MLP的效果，此时用时约为133s,epoch==10左右达到最高精度
 ![mnist_ResNet18.pth.png](figure/mnist_ResNet18.pth.png)
-ResNet34出现明显过拟合。其收敛总用时2271s，最高精确度可达99.33%,测试集精度非常不稳定。
+ResNet34出现明显过拟合。其计算总用时2271s，最高精确度可达99.33%,测试集精度非常不稳定。epoch==5左右达到最高精度
 ![mnist_ResNet34.pth.png](figure/mnist_ResNet34.pth.png)
-ResNet50过拟合现象有所改善。其收敛总用时4942s，最高精确度可达99.06%,测试集精度稍微稳定一点。
+ResNet50过拟合现象有所改善。其计算总用时4942s，最高精确度可达99.06%,测试集精度稍微稳定一点。epoch==3左右达到最高精度
 ![mnist_ResNet50.pth.png](figure/mnist_ResNet50.pth.png)
 
 ## 结论
