@@ -165,21 +165,30 @@ x.to(device)
 
 单隐藏层使用SGD优化器收敛时间119s，最大识别准确率95.45%
 ![mnist_MLP1.pth.png](figure/mnist_MLP1.pth.png)
-2隐藏层使用冲量SGD出现梯度消失问题，将冲量设为0能正常训练。收敛时间117s，最大识别准确率96.39%
+2隐藏层收敛时间117s，最大识别准确率96.39%
 ![mnist_MLP2.pth.png](figure/mnist_MLP2.pth.png)
-3隐藏层使用冲量SGD出现梯度消失问题，将冲量设为0能正常训练。收敛时间115s，最大识别准确率96.98%
+3隐藏层收敛时间115s，最大识别准确率96.98%
 ![mnist_MLP3.pth.png](figure/mnist_MLP3.pth.png)
-4隐藏层使用冲量SGD出现梯度消失问题，将冲量设为0能正常训练。收敛时间115s，最大识别准确率97.08%
-![mnist_MLP3.pth.png](figure/mnist_MLP4.pth.png)
+4隐藏层收敛时间115s，最大识别准确率97.08%
+![mnist_MLP4.pth.png](figure/mnist_MLP4.pth.png)
 
+对4隐藏层的多层感知机（全连接神经网络）尝试使用不同的优化器进行参数估计。
+**使用SGD优化器时**，收敛时间115s，最大准确率97.08%  
+**使用SGD优化器并采用1冲量时**，收敛时间120s，最大准确率97.38%。
+相较而言train误差曲线更为平滑，但test曲线抖动没有明显改善，且在收敛点附近反复横跳  
+**使用ADAM优化器时**，epoch2即完成收敛，收敛时间约30s，但最大识别准确率仅为11.35%
+根据曲线所示可基本认为模型发散了。
+![mnist_MLP4.adam.png](figure/mnist_MLP4.adam.png)
+
+所有测试中测试机和训练集误差变化都较为平缓；由于测试和训练集切分可能存在一些差异，导致模型在测试集中的误差比训练集中更高。
 ## LeNet
 
 该部分的网络定义在LeNetModel.py中。
 
 ## ResNet
 
-该部分的网络定义在resNetModel.py中。网络结构参考下述文章中的图片：
-[【深度学习】基于PyTorch搭建ResNet18、ResNet34、ResNet50、ResNet101、ResNet152网络](https://blog.csdn.net/weixin_39589455/article/details/126797751)
+该部分的网络定义在resNetModel.py中。网络结构如下：
+
 
 ### 对维度的操作
 
@@ -187,3 +196,7 @@ x.to(device)
 在本任务中我们通过一个卷积核为1的二维卷积层(conv2d)实现，通过设置输出通道数对齐第一维，通过滑动步数的设定对齐后两维。
 相关方法封装在不同ResNet的self.ResTransform对象中。
 由于pytorch内置的交叉熵函数是基于原始输出计算的（可认为内置了softmax层）因而在最后的全连接层后没有增加激活函数层。
+
+### 结果
+ResNet 18已经出现过拟合。其收敛总用时1324s，最高精确度可达99.23%,但在epoch==20前后出现明显的震荡。
+![mnist_ResNet18.pth.png](figure/mnist_ResNet18.pth.png)
