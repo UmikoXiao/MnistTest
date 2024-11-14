@@ -11,7 +11,7 @@ from torch.nn import CrossEntropyLoss
 from torch import optim
 from loadData import DealDataset
 
-save_path = "./mnist_MLP3.pth"  # 模型权重参数保存位置
+save_path = "./mnist_MLP4.pth"  # 模型权重参数保存位置
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # 创建GPU运算环境
 print(device)
 
