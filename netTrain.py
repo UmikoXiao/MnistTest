@@ -1,7 +1,7 @@
 import os.path
-
+import numpy as np
 import torch
-from pyexpat import model
+from sklearn.metrics import f1_score
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from matplotlib import pyplot as plt
@@ -24,7 +24,7 @@ from model.MLPModel import MLP
 from model.leNetModel import LeNet1, LeNet4, LeNet5
 from model.resNetModel import ResNet18, ResNet34, ResNet50
 
-testFramwork = ResNet50
+testFramwork = ResNet18
 
 """采用的优化器"""
 opt = optim.SGD
@@ -39,18 +39,20 @@ def testTurn(model, loader):
     # validation和test过程不需要反向传播
     model.eval()
     # 取测试数据
+    y_m,eta_m=[],[]
     for X, y in loader:
         X, y = X.to(device), y.to(device)
 
         with torch.no_grad():
             outputs = model(X)  # 计算测试数据的输出
             # 计算出out在第一维度上最大值对应编号，得模型的预测值
-            # 计算正确率
             _, eta = torch.max(outputs.data, dim=1)
         # 是否正确？
         correct += torch.eq(eta, y).float().sum().item()
+        y_m = np.append(y_m, y.cpu())
+        eta_m=np.append(eta_m,eta.cpu())
 
-    return correct / len(loader.dataset)
+    return correct / len(loader.dataset),f1_score(y_m,eta_m,average='micro')
 
 
 def trainTurn(model, loader, optimizer, epoch):
@@ -92,8 +94,8 @@ def main():
 
     t0 = time.time()
     # 加载数据集，指定训练或测试数据，指定于处理方式
-    trainDataset = DealDataset(os.path.abspath(r'.\dataset'), "trainTurn-images-idx3-ubyte.gz",
-                               "trainTurn-labels-idx1-ubyte.gz",
+    trainDataset = DealDataset(os.path.abspath(r'.\dataset'), "train-images-idx3-ubyte.gz",
+                               "train-labels-idx1-ubyte.gz",
                                transform=transforms.ToTensor())
     testDataset = DealDataset(os.path.abspath(r'.\dataset'), "t10k-images-idx3-ubyte.gz", "t10k-labels-idx1-ubyte.gz",
                               transform=transforms.ToTensor())
@@ -106,25 +108,27 @@ def main():
     optimizer = opt(net.parameters(), learning_rate)
     bestAcc = 0
 
-    accListTest, accListTrain = [], []
+    accListTest, accListTrain,f1 = [], [],[]
     for e in range(EPOCH):
         net.train()
         accTrain = trainTurn(net, train_dataloader, optimizer, e)
         print()
-        accTest = testTurn(net, test_dataloader)
+        accTest,f1Test = testTurn(net, test_dataloader)
         if accTest > bestAcc:
             bestAcc = accTest
             # torch.save(net.state_dict(), save_path)
         # else:
         #     net.load_state_dict(torch.load(save_path))
-        print('[epoch %d]: trainTurn accuracy: %.2f %%, testTurn accuracy: %.2f %%,best: %.2f %%' % (
+        print('[epoch %d]: train accuracy: %.2f %%, test accuracy: %.2f %%,best: %.2f %%' % (
             e + 1, 100 * accTrain, 100 * accTest, 100 * bestAcc))
         accListTest.append(accTest)
         accListTrain.append(accTrain)
+        f1.append(f1Test)
 
     print(time.time() - t0)
     plt.plot(accListTest, label='testTurn')
     plt.plot(accListTrain, label='trainTurn')
+    plt.plot(f1, label='F1Score')
     plt.legend()
     plt.xlabel('iteration')
     plt.ylabel('acc %')
