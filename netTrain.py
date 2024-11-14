@@ -26,7 +26,8 @@ from MLPModel import MLP
 testFramwork = MLP
 
 """采用的优化器"""
-opt = optim.SGD
+# opt = optim.SGD
+opt = optim.Adam
 
 """采用的损失函数"""
 lossFunc = CrossEntropyLoss()  # 交叉熵损失函数
