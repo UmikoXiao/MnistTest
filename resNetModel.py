@@ -47,7 +47,7 @@ class IdentityBlock(nn.Module):  # 步长设置为2时即为conv BLock
     def __init__(self, in_channel, hidden_channel, out_channel, stride=1):  # 3层conv,根据需求决定是否改变结构
         super(IdentityBlock, self).__init__()
         self.upsample = in_channel != out_channel
-        
+
         self.conv1 = nn.Conv2d(in_channel, hidden_channel, 1, 1, 0, bias=False)  # 1大小卷积，输入=输出
         self.bn1 = nn.BatchNorm2d(hidden_channel)  # 卷积后归一化处理，防止ReLU过大导致性能不稳定
         self.conv2 = nn.Conv2d(hidden_channel, hidden_channel, 3, stride, 1, bias=False)  # 3大小卷积，若需降采样，在此处改变步长

@@ -23,7 +23,7 @@ class LeNet1(nn.Module):
     def forward(self, x):
         x=self.layer1(x)
         x=self.layer2(x)
-        x = x.reshape(x.shape[0]*x.shape[1], -1)   # 将x展平
+        x = x.reshape(x.shape[0],x.shape[1]*x.shape[2]*x.shape[3])   # 将x展平
         x=self.linearLayer(x)
         return x
 
@@ -50,7 +50,7 @@ class LeNet4(nn.Module):
     def forward(self, x):
         x=self.layer1(x)
         x=self.layer2(x)
-        x = x.reshape(x.shape[0]*x.shape[1], -1)   # 将x展平
+        x = x.reshape(x.shape[0],x.shape[1]*x.shape[2]*x.shape[3])   # 将x展平
         x=self.linearLayer(x)
         return x
 
@@ -70,15 +70,15 @@ class LeNet5(nn.Module):
 
         self.linearLayer=nn.Sequential(
             nn.Linear(256, 120),
-            nn.Sigmoid(),
+            nn.ReLU(),
             nn.Linear(120, 84),
-            nn.Sigmoid(),
+            nn.ReLU(),
             nn.Dropout(p=0.5),
             nn.Linear(84, classes_num)
         )  # 全连接层获得结果
     def forward(self, x):
         x=self.layer1(x)
         x=self.layer2(x)
-        x = x.reshape(x.shape[0]*x.shape[1], -1)   # 将x展平
+        x = x.reshape(x.shape[0],x.shape[1]*x.shape[2]*x.shape[3])   # 将x展平
         x=self.linearLayer(x)
         return x
