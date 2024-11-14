@@ -11,7 +11,7 @@ from torch.nn import CrossEntropyLoss
 from torch import optim
 from loadData import DealDataset
 
-save_path = "./mnist_ResNet18.pth"  # 模型权重参数保存位置
+save_path = "./mnist_ResNet50.pth"  # 模型权重参数保存位置
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # 创建GPU运算环境
 print(device)
 
@@ -20,9 +20,8 @@ EPOCH = 30  # 总共训练轮数
 learning_rate = 0.05  # 学习率
 
 """采用的网络框架"""
-from resNetModel import ResNet18,ResNet34
-testFramwork = ResNet18
-# testFramwork = ResNet34
+from resNetModel import ResNet18,ResNet34,ResNet50
+testFramwork = ResNet50
 # from MLPModel import MLP
 # testFramwork = MLP
 

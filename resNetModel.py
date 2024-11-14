@@ -47,11 +47,12 @@ class IdentityBlock(nn.Module):  # 步长设置为2时即为conv BLock
     def __init__(self, in_channel, hidden_channel, out_channel, stride=1):  # 3层conv,根据需求决定是否改变结构
         super(IdentityBlock, self).__init__()
         self.upsample = in_channel != out_channel
-        self.conv1 = nn.Conv2d(in_channel, hidden_channel, 1, 1, 1, bias=False)  # 1大小卷积，输入=输出
-        self.bn1 = nn.BatchNorm2d(out_channel)  # 卷积后归一化处理，防止ReLU过大导致性能不稳定
+        
+        self.conv1 = nn.Conv2d(in_channel, hidden_channel, 1, 1, 0, bias=False)  # 1大小卷积，输入=输出
+        self.bn1 = nn.BatchNorm2d(hidden_channel)  # 卷积后归一化处理，防止ReLU过大导致性能不稳定
         self.conv2 = nn.Conv2d(hidden_channel, hidden_channel, 3, stride, 1, bias=False)  # 3大小卷积，若需降采样，在此处改变步长
-        self.bn2 = nn.BatchNorm2d(out_channel)  # 卷积后归一化处理，防止ReLU过大导致性能不稳定
-        self.conv3 = nn.Conv2d(hidden_channel, out_channel, 1, 1, 1, bias=False)  # 1大小卷积，输入=输出
+        self.bn2 = nn.BatchNorm2d(hidden_channel)  # 卷积后归一化处理，防止ReLU过大导致性能不稳定
+        self.conv3 = nn.Conv2d(hidden_channel, out_channel, 1, 1, 0, bias=False)  # 1大小卷积，输入=输出
         self.bn3 = nn.BatchNorm2d(out_channel)  # 卷积后归一化处理，防止ReLU过大导致性能不稳定
         if self.upsample:
             self.ResTransform = nn.Sequential(  # 维度发生改变时，对x进行升维处理
@@ -66,7 +67,7 @@ class IdentityBlock(nn.Module):  # 步长设置为2时即为conv BLock
 
         x = F.relu(self.bn1(self.conv1(x)), inplace=True)  # 第一次卷积relu
         x = F.relu(self.bn2(self.conv2(x)), inplace=True)  # 第二次卷积relu
-        x = self.bn2(self.conv2(x))  # 第三次卷积不relu
+        x = self.bn3(self.conv3(x))  # 第三次卷积不relu
 
         x += identity  # 旁路x相加，维持梯度
         return F.relu(x, inplace=True)  # relu后输出
@@ -185,7 +186,7 @@ class ResNet50(nn.Module):
             IdentityBlock(256, 64, 256, 1)
         )
         self.layer2 = nn.Sequential(  # 4个Identity升维降采样，64*7*7=>128*4*4
-            IdentityBlock(64, 128, 512, 2),
+            IdentityBlock(256, 128, 512, 2),
             IdentityBlock(512, 128, 512, 1),
             IdentityBlock(512, 128, 512, 1),
             IdentityBlock(512, 128, 512, 1),
@@ -198,7 +199,7 @@ class ResNet50(nn.Module):
             IdentityBlock(1024, 256, 1024, 1),
             IdentityBlock(1024, 256, 1024, 1)
         )
-        self.layer3 = nn.Sequential(  # 3个Identity升维降采样，256*2*2=>512*1*1
+        self.layer4 = nn.Sequential(  # 3个Identity升维降采样，256*2*2=>512*1*1
             IdentityBlock(1024, 512, 2048, 2),
             IdentityBlock(2048, 512, 2048, 1),
             IdentityBlock(2048, 512, 2048, 1)
