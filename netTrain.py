@@ -26,8 +26,8 @@ from MLPModel import MLP
 testFramwork = MLP
 
 """采用的优化器"""
-# opt = optim.SGD
-opt = optim.Adam
+opt = optim.SGD
+# opt = optim.Adam
 
 """采用的损失函数"""
 lossFunc = CrossEntropyLoss()  # 交叉熵损失函数
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     net = testFramwork(10)
     net.to(device)  # 实例化网络模型并送入GPU
     # net.load_state_dict(torch.load(save_path))  # 使用上次训练权重接着训练
-    optimizer = opt(net.parameters(), learning_rate)
+    optimizer = opt(net.parameters(), learning_rate,0.1)
     bestAcc = 0
 
     accListTest, accListTrain = [], []
@@ -105,7 +105,7 @@ if __name__ == '__main__':
         accTest = test(net, test_dataloader)
         if accTest > bestAcc:
             bestAcc = accTest
-            torch.save(net.state_dict(), save_path)
+            # torch.save(net.state_dict(), save_path)
         # else:
         #     net.load_state_dict(torch.load(save_path))
         print('[epoch %d]: train accuracy: %.2f %%, test accuracy: %.2f %%,best: %.2f %%' % (
