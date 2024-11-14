@@ -20,8 +20,9 @@ EPOCH = 30  # 总共训练轮数
 learning_rate = 0.05  # 学习率
 
 """采用的网络框架"""
-from resNetModel import ResNet18
-testFramwork = ResNet18
+from resNetModel import ResNet18,ResNet34
+# testFramwork = ResNet18
+testFramwork = ResNet34
 # from MLPModel import MLP
 # testFramwork = MLP
 
