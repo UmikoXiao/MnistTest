@@ -6,7 +6,7 @@
 和深层卷积神经网络的结构设计、超参数等对性能的影响。研究的网络结果包括：
 
 - 不同隐藏层数量(1,2,3)的多层感知机
-- LeNet1 - LeNet5
+- LeNet1, LeNet4, LeNet5
 - ResNet18，ResNet34，ResNet50
 
 ## 优化器选取
@@ -184,12 +184,14 @@ x.to(device)
 ## LeNet
 
 该部分的网络定义在LeNetModel.py中。
-
+![LeNet.png](figure/LeNet.png)
 ## ResNet
 
 该部分的网络定义在resNetModel.py中。网络结构如下：
-
-
+![ResNet.png](figure/ResNet.png)
+ResNet主要两个特点是
+- 对输入x进行直连或者升维操作，与残差连接从而维持梯度
+- 使用BatchNorm对维度之间进行归一化，防止ReLU带来的梯度爆炸
 ### 对维度的操作
 
 残差神经网络因为对残差x的变换需要跟输出对应，因而要根据该layer的升维/降采样等进行调整。
@@ -198,5 +200,15 @@ x.to(device)
 由于pytorch内置的交叉熵函数是基于原始输出计算的（可认为内置了softmax层）因而在最后的全连接层后没有增加激活函数层。
 
 ### 结果
-ResNet 18已经出现过拟合。其收敛总用时1324s，最高精确度可达99.23%,但在epoch==20前后出现明显的震荡。
+ResNet18已经出现过拟合。其收敛总用时1324s，最高精确度可达99.23%,测试集精度非常不稳定。
+同时其epoch1的acc就已经达到96.98%，相当于三层隐藏层MLP的效果，此时用时约为133s
 ![mnist_ResNet18.pth.png](figure/mnist_ResNet18.pth.png)
+ResNet34出现明显过拟合。其收敛总用时2271s，最高精确度可达99.33%,测试集精度非常不稳定。
+![mnist_ResNet34.pth.png](figure/mnist_ResNet34.pth.png)
+ResNet50过拟合现象有所改善。其收敛总用时4942s，最高精确度可达99.06%,测试集精度稍微稳定一点。
+![mnist_ResNet50.pth.png](figure/mnist_ResNet50.pth.png)
+
+## 结论
+三个网络对比而言，明显对于MNIST数据集的分类问题来说，多层感知机的网络复杂度已经足够完成任务；
+当需要绝对高的精度时，使用LeNet5可以将精确度提升到99%以上；
+而使用ResNet将因为网络过于复杂而导致过拟合。
