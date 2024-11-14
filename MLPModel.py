@@ -10,12 +10,15 @@ class MLP(nn.Module):
             nn.ReLU(inplace=True),
         )
         self.hidderLayer =nn.Sequential(
-            nn.Linear(56*56, 28*28),  # 全连接层升采样
+            nn.Linear(56*56, 28*28),  # 全连接层降采样
+            nn.ReLU(inplace=True),
+            nn.Linear(28*28, 14*14),  # 全连接层降采样
             nn.ReLU(inplace=True),
         )
+
         self.outputLayer=nn.Sequential(
             nn.Dropout(p=0.5),
-            nn.Linear(28*28, classes_num)
+            nn.Linear(14*14, classes_num)
         )  # 全连接层获得结果
     def forward(self, x):
         x = x.reshape(x.shape[0]*x.shape[1], -1)   # 将x展平
